@@ -364,6 +364,8 @@ MonoBehaviour:
   GemPrefabArray:
   - type: 0
     gemPrefab: {fileID: 4188224041304326468, guid: 577ad5a842473e94cbdeb81e8e9fa952, type: 3}
+  - type: 1
+    gemPrefab: {fileID: 3684089082029533862, guid: 8ecdf8976acb2dc468cc7aa459a3a7a3, type: 3}
   BorderPrefab: {fileID: 5371594576175845439, guid: dce4f6509166a984587f9636cbf336c5, type: 3}
 --- !u!1 &2015318743
 GameObject:

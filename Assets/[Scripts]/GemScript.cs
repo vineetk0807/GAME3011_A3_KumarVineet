@@ -10,6 +10,7 @@ using UnityEngine;
 public enum GemType
 {
     NORMAL,
+    EMPTY,
     TOTAL_TYPES
 }
 
