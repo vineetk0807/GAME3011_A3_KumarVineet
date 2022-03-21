@@ -157,6 +157,10 @@ public class GridManager : MonoBehaviour
 
                     if (gemBelow.type == GemType.EMPTY)
                     {
+
+                        // Clean up #1
+                        Destroy(gemBelow.gameObject);
+
                         gem.movableComponent.Move(x , (y + 1) ,fillInterval);
                         gemArray[x, y + 1] = gem;
                         SpawnNewGem(x, y, GemType.EMPTY);
@@ -172,12 +176,17 @@ public class GridManager : MonoBehaviour
             GemBehaviour gemBelow = gemArray[x, 0];
             if (gemBelow.type == GemType.EMPTY)
             {
+                // Clean up #2
+                Destroy(gemBelow.gameObject);
                 GameObject tempGem = Instantiate(gemDictionary[GemType.NORMAL], GetWorldPosition(x, -1), Quaternion.identity);
                 tempGem.transform.SetParent(transform);
 
                 gemArray[x, 0] = tempGem.GetComponent<GemBehaviour>();
+                
                 gemArray[x, 0].Initialize(x,-1, this, GemType.NORMAL);
+                
                 gemArray[x, 0].movableComponent.Move(x , 0 , fillInterval);
+                
                 gemArray[x, 0].colorComponent.SetColor(
                         ((GemColor.ColorType)(Random.Range(0, gemArray[x, 0].colorComponent.GetTotalColors())))
                         );
