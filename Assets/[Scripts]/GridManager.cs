@@ -85,6 +85,10 @@ public class GridManager : MonoBehaviour
             }
         }
 
+        // Test block functionality
+        Destroy(gemArray[4, 2].gameObject);
+        SpawnNewGem(4, 2, GemType.BLOCK);
+
         StartCoroutine(Fill());
 
         // Set Grid starting position
@@ -129,6 +133,7 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public IEnumerator Fill()
     {
+        // Every Fill piece has an interval time
         while (FillStep())
         {
             yield return new WaitForSeconds(fillInterval);

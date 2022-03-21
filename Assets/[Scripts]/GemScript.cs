@@ -11,6 +11,7 @@ public enum GemType
 {
     NORMAL,
     EMPTY,
+    BLOCK,
     TOTAL_TYPES
 }
 
