@@ -35,7 +35,11 @@ public class GridManager : MonoBehaviour
     // Border Array
     private BorderScript[,] borderArray;
 
+    [Header("Fill Interval")]
     public float fillInterval = 0.1f;
+
+    [Header("Swap Back Interval")] 
+    public float SwapBackInterval = 0.2f;
 
     // Diagonal filling
     private bool inverse = false;
@@ -399,31 +403,79 @@ public class GridManager : MonoBehaviour
             gemArray[gem1.X, gem1.Y] = gem2;
             gemArray[gem2.X, gem2.Y] = gem1;
 
-            //--- Check for match first
+            int tempX = gem1.X;
+            int tempY = gem1.Y;
 
-            if (GetMatch(gem1, gem2.X, gem2.Y) != null || GetMatch(gem2, gem1.X, gem1.Y) != null)
+            // 
+            switch (GameManager.GetInstance().difficulty)
             {
-                int tempX = gem1.X;
-                int tempY = gem1.Y;
 
-                gem1.movableComponent.Move(gem2.X, gem2.Y, fillInterval);
-                gem2.movableComponent.Move(tempX, tempY, fillInterval);
+                case Difficulty.EASY:
+                    gem1.movableComponent.Move(gem2.X, gem2.Y, fillInterval);
+                    gem2.movableComponent.Move(tempX, tempY, fillInterval);
 
-                // After a gem swap, clear the valid matches
-                ClearAllValidMatches();
+                    // After a gem swap, clear the valid matches
+                    ClearAllValidMatches();
 
-                // Update the Fill Coroutine if more matches are made
-                StartCoroutine(Fill());
+                    // Update the Fill Coroutine if more matches are made
+                    StartCoroutine(Fill());
+                    break;
+
+                case Difficulty.NORMAL:
+                case Difficulty.HARD:
+                    //--- Check for match first
+
+                    if (GetMatch(gem1, gem2.X, gem2.Y) != null || GetMatch(gem2, gem1.X, gem1.Y) != null)
+                    {
+                        gem1.movableComponent.Move(gem2.X, gem2.Y, fillInterval);
+                        gem2.movableComponent.Move(tempX, tempY, fillInterval);
+
+                        // After a gem swap, clear the valid matches
+                        ClearAllValidMatches();
+
+                        // Update the Fill Coroutine if more matches are made
+                        StartCoroutine(Fill());
+                    }
+                    else
+                    {
+                        // If not match, then swap, and swap back
+                        StartCoroutine(NoMatchSwapBackGem(gem1, gem2));
+
+                        // return them back to their original position
+                        gemArray[gem1.X, gem1.Y] = gem1;
+                        gemArray[gem2.X, gem2.Y] = gem2;
+                    }
+                    break;
             }
-            else
-            {
-                // return them back to their original position
-                gemArray[gem1.X, gem1.Y] = gem1;
-                gemArray[gem2.X, gem2.Y] = gem2;
-            }
-
-
         }
+    }
+
+    /// <summary>
+    /// Swap first, then swap back if not match
+    /// </summary>
+    /// <param name="gem1"></param>
+    /// <param name="gem2"></param>
+    IEnumerator NoMatchSwapBackGem(GemBehaviour gem1, GemBehaviour gem2)
+    {
+        gemArray[gem1.X, gem1.Y] = gem2;
+        gemArray[gem2.X, gem2.Y] = gem1;
+
+        int tempX = gem1.X;
+        int tempY = gem1.Y;
+
+        gem1.movableComponent.Move(gem2.X, gem2.Y, fillInterval);
+        gem2.movableComponent.Move(tempX, tempY, fillInterval);
+
+        yield return new WaitForSeconds(SwapBackInterval);
+
+        gemArray[gem1.X, gem1.Y] = gem1;
+        gemArray[gem2.X, gem2.Y] = gem2;
+
+        tempX = gem1.X;
+        tempY = gem1.Y;
+
+        gem1.movableComponent.Move(gem2.X, gem2.Y, fillInterval);
+        gem2.movableComponent.Move(tempX, tempY, fillInterval);
     }
 
 
@@ -591,6 +643,8 @@ public class GridManager : MonoBehaviour
                             matchingGemsList.Add(matchedGem);
                         }
 
+                        Debug.Log("Horizontal Swap, Vertical L or T match !!!");
+
                         break;
                     }
                 }
@@ -708,6 +762,7 @@ public class GridManager : MonoBehaviour
                             matchingGemsList.Add(matchedGem);
                         }
 
+                        Debug.Log("Vertical Swap, Horizontal L or T match !!!");
                         break;
                     }
                 }

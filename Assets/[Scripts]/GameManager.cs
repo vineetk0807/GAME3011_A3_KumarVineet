@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
         blockedCoordinates.Add(new Vector2(2, 1));
         blockedCoordinates.Add(new Vector2(3, 8));
         blockedCoordinates.Add(new Vector2(4, 9));
-        blockedCoordinates.Add(new Vector2(5, 0));
+        blockedCoordinates.Add(new Vector2(5, 5));
         blockedCoordinates.Add(new Vector2(6, 6));
         blockedCoordinates.Add(new Vector2(7, 2));
         blockedCoordinates.Add(new Vector2(8, 4));
