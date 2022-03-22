@@ -210,12 +210,22 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public IEnumerator Fill()
     {
+        // Check for matches when filling, just in case they match
+        bool needsRefill = true;
+
         // Every Fill gem has an interval time
-        while (FillStep())
+        while (needsRefill)
         {
-            // toggle it for every call
-            inverse = !inverse;
             yield return new WaitForSeconds(fillInterval);
+
+            while (FillStep())
+            {
+                // toggle it for every call
+                inverse = !inverse;
+                yield return new WaitForSeconds(fillInterval);
+            }
+
+            needsRefill = ClearAllValidMatches();
         }
     }
 
@@ -287,7 +297,7 @@ public class GridManager : MonoBehaviour
                                     // check for empty
                                     if (diagonalGem.type == GemType.EMPTY)
                                     {
-                                        bool hasAPieceAbove = true;
+                                        bool hasAGemAbove = true;
 
                                         for (int aboveY = y; aboveY >= 0; aboveY--)
                                         {
@@ -304,14 +314,14 @@ public class GridManager : MonoBehaviour
                                                 // Blocked
                                                 if (!gemAbove.IsMovable() && gemAbove.type != GemType.EMPTY)
                                                 {
-                                                    hasAPieceAbove = false;
+                                                    hasAGemAbove = false;
                                                     break;
                                                 }
                                             }
                                         }
 
                                         // Spawn normally
-                                        if (!hasAPieceAbove)
+                                        if (!hasAGemAbove)
                                         {
                                             Destroy(diagonalGem.gameObject);
                                             gem.movableComponent.Move(diagX, y + 1, fillInterval);
@@ -363,7 +373,7 @@ public class GridManager : MonoBehaviour
 
 
     /// <summary>
-    /// Check if 2 pieces are adjacent based on their x,y
+    /// Check if 2 gems are adjacent based on their x,y
     /// </summary>
     /// <param name="gem1"></param>
     /// <param name="gem2"></param>
@@ -398,6 +408,12 @@ public class GridManager : MonoBehaviour
 
                 gem1.movableComponent.Move(gem2.X, gem2.Y, fillInterval);
                 gem2.movableComponent.Move(tempX, tempY, fillInterval);
+
+                // After a gem swap, clear the valid matches
+                ClearAllValidMatches();
+
+                // Update the Fill Coroutine if more matches are made
+                StartCoroutine(Fill());
             }
             else
             {
@@ -463,6 +479,7 @@ public class GridManager : MonoBehaviour
 
     /// <summary>
     /// Check for matching gems in a straight line
+    /// Update for L and T shape
     /// </summary>
     public List<GemBehaviour> GetMatch(GemBehaviour gem, int gemX, int gemY)
     {
@@ -470,12 +487,12 @@ public class GridManager : MonoBehaviour
         {
             GemColor.ColorType color = gem.colorComponent.Color;
 
-            // take the gem's horizontal and vertical piece list and traverse accordingly
+            // take the gem's horizontal and vertical gem list and traverse accordingly
             List<GemBehaviour> horizontalGemsList = new List<GemBehaviour>();
             List<GemBehaviour> verticalGemsList = new List<GemBehaviour>();
             List<GemBehaviour> matchingGemsList = new List<GemBehaviour>();
 
-            // --- HORIZONTAL ---
+            //  HORIZONTALLY FIRST
             horizontalGemsList.Add(gem);
             for (int direction = 0; direction <= 1; direction++)
             {
@@ -522,14 +539,76 @@ public class GridManager : MonoBehaviour
                 }
             }
 
+            // Update to L & T shape
+            // Traverse VERTICALLY if matching horizontally !!!
+            if (horizontalGemsList.Count >= matchNumber)
+            {
+                for (int i = 0; i < horizontalGemsList.Count; i++)
+                {
+                    for (int direction = 0; direction <= 1; direction++)
+                    {
+                        for (int yOffset = 1; yOffset < Y_GridDimensions; yOffset++)
+                        {
+                            int y;
+                            
+                            // Upwards
+                            if (direction == 0)
+                            {
+                                y = gemY - yOffset;
+                            }
+                            else        // downwards
+                            {
+                                y = gemY + yOffset;
+                            }
+
+                            // break out if out of the grid boundaries
+                            if (y < 0 || y >= Y_GridDimensions)
+                            {
+                                break;
+                            }
+
+                            // if color is matching
+                            if (gemArray[horizontalGemsList[i].X, y].IsColored() && gemArray[horizontalGemsList[i].X, y].colorComponent.Color == color)
+                            {
+                                verticalGemsList.Add(gemArray[horizontalGemsList[i].X, y]);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    // If not enough matching gems, clear the list
+                    if (verticalGemsList.Count < matchNumber - 1)
+                    {
+                        verticalGemsList.Clear();
+                    }
+                    else        // enough or more than enough matches, add the gems to that list
+                    {
+                        foreach (var matchedGem in verticalGemsList)
+                        {
+                            matchingGemsList.Add(matchedGem);
+                        }
+
+                        break;
+                    }
+                }
+            }
+
             // Return the matching list
-            if (matchingGemsList.Count >= 3)
+            if (matchingGemsList.Count >= matchNumber)
             {
                 return matchingGemsList;
             }
 
 
-            // --- VERTICAL ---
+            //  VERTICALLY SECOND
+            // Since the match for vertical was checked during horizontal, the lists are loaded up
+            // Clear them first if no horizontal match was found first
+            horizontalGemsList.Clear();
+            verticalGemsList.Clear();
+
             verticalGemsList.Add(gem);
             for (int direction = 0; direction <= 1; direction++)
             {
@@ -576,14 +655,127 @@ public class GridManager : MonoBehaviour
                 }
             }
 
+
+            // Update to L & T shape
+            // Traverse HORIZONTALLY if matching vertically !!!
+            if (verticalGemsList.Count >= matchNumber)
+            {
+                for (int i = 0; i < verticalGemsList.Count; i++)
+                {
+                    for (int direction = 0; direction <= 1; direction++)
+                    {
+                        for (int xOffset = 1; xOffset < X_GridDimensions; xOffset++)
+                        {
+                            int x;
+
+                            // left
+                            if (direction == 0)
+                            {
+                                x = gemX - xOffset;
+                            }
+                            else        // right
+                            {
+                                x = gemX + xOffset;
+                            }
+
+                            // break out if out of the grid boundaries
+                            if (x < 0 || x >= X_GridDimensions)
+                            {
+                                break;
+                            }
+
+                            // if color is matching
+                            if (gemArray[x, verticalGemsList[i].Y].IsColored() && gemArray[x, verticalGemsList[i].Y].colorComponent.Color == color)
+                            {
+                                horizontalGemsList.Add(gemArray[x, verticalGemsList[i].Y]);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    // If not enough matching gems, clear the list
+                    if (horizontalGemsList.Count < matchNumber - 1)
+                    {
+                        horizontalGemsList.Clear();
+                    }
+                    else        // enough or more than enough matches, add the gems to that list
+                    {
+                        foreach (var matchedGem in horizontalGemsList)
+                        {
+                            matchingGemsList.Add(matchedGem);
+                        }
+
+                        break;
+                    }
+                }
+            }
+
             // Return the matching list
-            if (matchingGemsList.Count >= 3)
+            if (matchingGemsList.Count >= matchNumber)
             {
                 return matchingGemsList;
             }
         }
 
         return null;
+    }
+
+
+    /// <summary>
+    /// Clear gem to actually remove the gems that match
+    /// when changed the position
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public bool ClearGem(int x, int y)
+    {
+        // If clearable and not already clearing
+        if (gemArray[x, y].IsClearable() && !gemArray[x, y].clearComponent.IsBeingCleared)
+        {
+            gemArray[x,y].clearComponent.ClearGem();
+            SpawnNewGem(x, y, GemType.EMPTY);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// If any match happens by default/indirectly, clear them also
+    /// </summary>
+    /// <returns></returns>
+    public bool ClearAllValidMatches()
+    {
+        bool needsRefill = false;
+
+        for (int y = 0; y < Y_GridDimensions; y++)
+        {
+            for (int x = 0; x < X_GridDimensions; x++)
+            {
+                if (gemArray[x, y].IsClearable())
+                {
+                    List<GemBehaviour> match = GetMatch(gemArray[x, y], x, y);
+
+                    if (match != null)
+                    {
+                        for (int i = 0; i < match.Count; i++)
+                        {
+                            if (ClearGem(match[i].X, match[i].Y))
+                            {
+                                needsRefill = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return needsRefill;
     }
 
     // ---------------------------------------- Game management ---------------------------------------- //

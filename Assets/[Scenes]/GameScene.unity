@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockedCoordinates: []
-  difficulty: 1
+  difficulty: 0
 --- !u!1 &848506802
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,6 +418,9 @@ MonoBehaviour:
   BorderPrefab: {fileID: 5371594576175845439, guid: dce4f6509166a984587f9636cbf336c5, type: 3}
   fillInterval: 0.1
   difficultyBlockers: 0200000005000000
+  matchNumber: 3
+  matchNumber_EasyNormal: 3
+  matchNumber_Hard: 4
 --- !u!1 &2015318743
 GameObject:
   m_ObjectHideFlags: 0

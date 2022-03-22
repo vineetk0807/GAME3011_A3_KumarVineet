@@ -21,6 +21,10 @@ public class GemBehaviour : MonoBehaviour
     // Color component of gem
     public GemColor colorComponent;
 
+    // Clear Gem component
+    public GemClear clearComponent;
+
+
     // Getters and Setters
     public int X
     {
@@ -50,6 +54,7 @@ public class GemBehaviour : MonoBehaviour
     {
         movableComponent = GetComponent<GemMovementBehaviour>();
         colorComponent = GetComponent<GemColor>();
+        clearComponent = GetComponent<GemClear>();
     }
 
     // Update is called once per frame
@@ -93,6 +98,23 @@ public class GemBehaviour : MonoBehaviour
     public bool IsColored()
     {
         if (colorComponent)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    
+    /// <summary>
+    /// If Clear component exists, then return true
+    /// </summary>
+    /// <returns></returns>
+    public bool IsClearable()
+    {
+        if (clearComponent)
         {
             return true;
         }
