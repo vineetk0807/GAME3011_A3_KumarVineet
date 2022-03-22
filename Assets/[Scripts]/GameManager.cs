@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+/// <summary>
+/// This Match-3 game was referred from an online tutorial video and was as I saw fit at places that were requirements for this assignment
+/// Reference Link: https://www.youtube.com/watch?v=i7jTb-dEpqM
+/// </summary>
+
+
 // Difficulty variations
 public enum Difficulty
 {
@@ -32,16 +38,7 @@ public class GameManager : MonoBehaviour
     {
         _instance = this;
         blockedCoordinates = new List<Vector2>();
-
-        blockedCoordinates.Add(new Vector2(1,5));
-        blockedCoordinates.Add(new Vector2(2,1));
-        blockedCoordinates.Add(new Vector2(3,8));
-        blockedCoordinates.Add(new Vector2(4,9));
-        blockedCoordinates.Add(new Vector2(5,0));
-        blockedCoordinates.Add(new Vector2(6,6));
-        blockedCoordinates.Add(new Vector2(7,2));
-        blockedCoordinates.Add(new Vector2(8,4));
-        blockedCoordinates.Add(new Vector2(9,9));
+        LoadBlockedCoordinates();
     }
 
     
@@ -59,5 +56,22 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         
+    }
+
+
+    /// <summary>
+    /// Loads blocked coordinates
+    /// </summary>
+    private void LoadBlockedCoordinates()
+    {
+        blockedCoordinates.Add(new Vector2(1, 5));
+        blockedCoordinates.Add(new Vector2(2, 1));
+        blockedCoordinates.Add(new Vector2(3, 8));
+        blockedCoordinates.Add(new Vector2(4, 9));
+        blockedCoordinates.Add(new Vector2(5, 0));
+        blockedCoordinates.Add(new Vector2(6, 6));
+        blockedCoordinates.Add(new Vector2(7, 2));
+        blockedCoordinates.Add(new Vector2(8, 4));
+        blockedCoordinates.Add(new Vector2(9, 3));
     }
 }

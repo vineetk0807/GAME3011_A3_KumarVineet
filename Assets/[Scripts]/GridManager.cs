@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class GridManager : MonoBehaviour
 {
     // Display the public struct in Inspector
@@ -30,12 +32,26 @@ public class GridManager : MonoBehaviour
     // Gem Array
     private GemBehaviour[,] gemArray;
 
+    // Border Array
+    private BorderScript[,] borderArray;
+
     public float fillInterval = 0.1f;
 
     // Diagonal filling
     private bool inverse = false;
 
+    // Blocker
     public int[] difficultyBlockers;
+
+    // Gem Swapping
+    private GemBehaviour pressedGem;
+    private GemBehaviour enteredGem;
+
+    // Match number based on difficulty
+    [Header("Match number on Difficulty")]
+    public int matchNumber = 3;
+    public int matchNumber_EasyNormal = 3;
+    public int matchNumber_Hard = 4;
 
     // Start is called before the first frame update
     void Start()
@@ -54,6 +70,9 @@ public class GridManager : MonoBehaviour
         // Gem Array
         gemArray = new GemBehaviour[X_GridDimensions, Y_GridDimensions];
 
+        // Border Array
+        borderArray = new BorderScript[X_GridDimensions, Y_GridDimensions];
+
         // Create grid elements - border and gem
         for (int i = 0; i < X_GridDimensions; i++)
         {
@@ -61,8 +80,10 @@ public class GridManager : MonoBehaviour
             {
                 // Border
                 GameObject border = Instantiate(BorderPrefab, GetWorldPosition(i,j), Quaternion.identity);
+                borderArray[i, j] = border.GetComponent<BorderScript>();
+                borderArray[i,j].Initialize(i,j,this);
                 border.transform.SetParent(transform);
-
+                
                 // Empty Gem
                 SpawnNewGem(i,j,GemType.EMPTY);
 
@@ -90,6 +111,17 @@ public class GridManager : MonoBehaviour
             }
         }
 
+        // Set match number
+        if (GameManager.GetInstance().difficulty == Difficulty.HARD)
+        {
+            matchNumber = matchNumber_Hard;
+        }
+        else
+        {
+            matchNumber = matchNumber_EasyNormal;
+        }
+
+
         // Test block functionality <- this involves complexity/difficulty of the game
 
         // Difficulty Manager
@@ -98,7 +130,7 @@ public class GridManager : MonoBehaviour
             SpawnBlockers();
         }
         
-        // Spawn Blocking Pieces
+        // Spawn Blocking Gems
 
         StartCoroutine(Fill());
 
@@ -112,7 +144,6 @@ public class GridManager : MonoBehaviour
         
     }
 
-    
     // Get world position with x and y grid factor for offset
     public Vector2 GetWorldPosition(float x, float y)
     {
@@ -157,7 +188,7 @@ public class GridManager : MonoBehaviour
 
 
     /// <summary>
-    /// Spawn a new empty piece
+    /// Spawn a new empty gem
     /// </summary>
     /// <param name="x">i index</param>
     /// <param name="y">j index</param>
@@ -174,13 +205,12 @@ public class GridManager : MonoBehaviour
         return gemArray[x, y];
     }
 
-
     /// <summary>
     /// Fill Coroutine
     /// </summary>
     public IEnumerator Fill()
     {
-        // Every Fill piece has an interval time
+        // Every Fill gem has an interval time
         while (FillStep())
         {
             // toggle it for every call
@@ -251,7 +281,7 @@ public class GridManager : MonoBehaviour
                                 // Check if x coordinate is within the bounds
                                 if (diagX >= 0 && diagX < X_GridDimensions)
                                 {
-                                    // Get reference to that piece
+                                    // Get reference to that gem
                                     GemBehaviour diagonalGem = gemArray[diagX, y + 1];
 
                                     // check for empty
@@ -326,6 +356,237 @@ public class GridManager : MonoBehaviour
 
         return movedGem;
     }
+
+
+
+    // ------------------------------------- Match3 functionality ------------------------------------- //
+
+
+    /// <summary>
+    /// Check if 2 pieces are adjacent based on their x,y
+    /// </summary>
+    /// <param name="gem1"></param>
+    /// <param name="gem2"></param>
+    /// <returns></returns>
+    public bool IsAdjacent(GemBehaviour gem1, GemBehaviour gem2)
+    {
+        // If x or y are same, check if the other is within 1 units
+        return (gem1.X == gem2.X && (int)Mathf.Abs(gem1.Y - gem2.Y) == 1) ||
+               (gem1.Y == gem2.Y && (int)Mathf.Abs(gem1.X - gem2.X) == 1);
+    }
+
+
+    /// <summary>
+    /// Swap gem functionality to swap the coordinates of gem 1 and gem 2
+    /// </summary>
+    /// <param name="gem1"></param>
+    /// <param name="gem2"></param>
+    public void SwapGem(GemBehaviour gem1, GemBehaviour gem2)
+    {
+        if (gem1.IsMovable() && gem2.IsMovable())
+        {
+            // Swap them
+            gemArray[gem1.X, gem1.Y] = gem2;
+            gemArray[gem2.X, gem2.Y] = gem1;
+
+            //--- Check for match first
+
+            if (GetMatch(gem1, gem2.X, gem2.Y) != null || GetMatch(gem2, gem1.X, gem1.Y) != null)
+            {
+                int tempX = gem1.X;
+                int tempY = gem1.Y;
+
+                gem1.movableComponent.Move(gem2.X, gem2.Y, fillInterval);
+                gem2.movableComponent.Move(tempX, tempY, fillInterval);
+            }
+            else
+            {
+                // return them back to their original position
+                gemArray[gem1.X, gem1.Y] = gem1;
+                gemArray[gem2.X, gem2.Y] = gem2;
+            }
+
+
+        }
+    }
+
+
+    /// <summary>
+    /// Assign pressed gem
+    /// </summary>
+    /// <param name="gem"></param>
+    public void PressGem(GemBehaviour gem)
+    {
+        pressedGem = gem;
+    }
+
+    /// <summary>
+    /// Gem that we are hovering over
+    /// </summary>
+    /// <param name="gem"></param>
+    public void EnteredGem(GemBehaviour gem)
+    {
+        enteredGem = gem;
+    }
+
+
+    /// <summary>
+    /// On release click, if they are adjacent, then swap
+    /// </summary>
+    public void ReleaseGem()
+    {
+        if (IsAdjacent(pressedGem, enteredGem))
+        {
+            SwapGem(pressedGem,enteredGem);
+        }
+    }
+
+    /// <summary>
+    /// Call border enter function
+    /// </summary>
+    /// <param name="gem"></param>
+    public void EnteredBorder(GemBehaviour gem)
+    {
+        borderArray[gem.X,gem.Y].BorderEnter();
+    }
+
+
+    /// <summary>
+    /// Call border exit function
+    /// </summary>
+    /// <param name="gem"></param>
+    public void ExitBorder(GemBehaviour gem)
+    {
+        borderArray[gem.X,gem.Y].BorderExit();
+    }
+
+
+    /// <summary>
+    /// Check for matching gems in a straight line
+    /// </summary>
+    public List<GemBehaviour> GetMatch(GemBehaviour gem, int gemX, int gemY)
+    {
+        if (gem.IsColored())
+        {
+            GemColor.ColorType color = gem.colorComponent.Color;
+
+            // take the gem's horizontal and vertical piece list and traverse accordingly
+            List<GemBehaviour> horizontalGemsList = new List<GemBehaviour>();
+            List<GemBehaviour> verticalGemsList = new List<GemBehaviour>();
+            List<GemBehaviour> matchingGemsList = new List<GemBehaviour>();
+
+            // --- HORIZONTAL ---
+            horizontalGemsList.Add(gem);
+            for (int direction = 0; direction <= 1; direction++)
+            {
+                for (int xOffset = 1; xOffset < X_GridDimensions; xOffset++)    // how far from the centre gem
+                {
+                    int x;
+
+                    // Left Direction
+                    if (direction == 0)
+                    {
+                        x = gemX - xOffset;
+                    }
+                    else    // Right Direction
+                    {
+                        x = gemX + xOffset;
+                    }
+
+
+                    // check for out of bounds horizontally
+                    if (x < 0 || x >= X_GridDimensions)
+                    {
+                        break;
+                    }
+
+                    // matched, add it to the list
+                    if (gemArray[x, gemY].IsColored() && gemArray[x, gemY].colorComponent.Color == color)
+                    {
+                        horizontalGemsList.Add(gemArray[x,gemY]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                }
+            }
+
+            // If the count of horizontal gem list is greater than matching number, add it to matching list
+            if (horizontalGemsList.Count >= matchNumber)
+            {
+                foreach (var matchedGem in horizontalGemsList)
+                {
+                    matchingGemsList.Add(matchedGem);   
+                }
+            }
+
+            // Return the matching list
+            if (matchingGemsList.Count >= 3)
+            {
+                return matchingGemsList;
+            }
+
+
+            // --- VERTICAL ---
+            verticalGemsList.Add(gem);
+            for (int direction = 0; direction <= 1; direction++)
+            {
+                for (int yOffset = 1; yOffset < Y_GridDimensions; yOffset++)    // how far from the centre gem
+                {
+                    int y;
+
+                    // Up Direction
+                    if (direction == 0)
+                    {
+                        y = gemY - yOffset;
+                    }
+                    else    // Down Direction
+                    {
+                        y = gemY + yOffset;
+                    }
+
+
+                    // check for out of bounds vertically
+                    if (y < 0 || y >= Y_GridDimensions)
+                    {
+                        break;
+                    }
+
+                    // matched, add it to the list
+                    if (gemArray[gemX, y].IsColored() && gemArray[gemX, y].colorComponent.Color == color)
+                    {
+                        verticalGemsList.Add(gemArray[gemX, y]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                }
+            }
+
+            // If the count of vertical gem list is greater than matching number, add it to matching list
+            if (verticalGemsList.Count >= matchNumber)
+            {
+                foreach (var matchedGem in verticalGemsList)
+                {
+                    matchingGemsList.Add(matchedGem);
+                }
+            }
+
+            // Return the matching list
+            if (matchingGemsList.Count >= 3)
+            {
+                return matchingGemsList;
+            }
+        }
+
+        return null;
+    }
+
+    // ---------------------------------------- Game management ---------------------------------------- //
 
 
     /// <summary>

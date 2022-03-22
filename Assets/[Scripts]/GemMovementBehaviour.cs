@@ -21,7 +21,7 @@ public class GemMovementBehaviour : MonoBehaviour
     }
 
     // Move to given position
-    public void Move(float newX, float newY, float time)
+    public void Move(int newX, int newY, float time)
     {
         // stop coroutine if the move coroutine doesn't exist
         if (moveCoroutine != null)
@@ -38,7 +38,7 @@ public class GemMovementBehaviour : MonoBehaviour
 
 
     // Coroutine to move smoothly with "time" interval
-    private IEnumerator MoveSmoothly(float newX, float newY, float time)
+    private IEnumerator MoveSmoothly(int newX, int newY, float time)
     {
         gem.X = newX;
         gem.Y = newY;

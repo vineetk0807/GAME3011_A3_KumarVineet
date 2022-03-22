@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6114418954078137355}
   - component: {fileID: 3658217839438448241}
+  - component: {fileID: 7147962578927180087}
   m_Layer: 0
   m_Name: Border
   m_TagString: Untagged
@@ -82,3 +83,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7147962578927180087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5371594576175845439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6d2ff7bc86d7fd419fcf46558f9da0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridRef: {fileID: 0}
+  normalBorder: {fileID: 21300000, guid: 6533c3551eade7b4a972c43db8b9338d, type: 3}
+  highlightedBorder: {fileID: 21300000, guid: bd345be38a9d7fd438e008b0fd91bf5b, type: 3}

@@ -6,8 +6,8 @@ using UnityEngine;
 public class GemBehaviour : MonoBehaviour
 {
     // Position in the grid
-    private float x;
-    private float y;
+    private int x;
+    private int y;
 
     // Type
     public GemType type;
@@ -22,7 +22,7 @@ public class GemBehaviour : MonoBehaviour
     public GemColor colorComponent;
 
     // Getters and Setters
-    public float X
+    public int X
     {
         get { return x; }
         set
@@ -34,7 +34,7 @@ public class GemBehaviour : MonoBehaviour
         }
     }
 
-    public float Y
+    public int Y
     {
         get { return y; }
         set
@@ -61,7 +61,7 @@ public class GemBehaviour : MonoBehaviour
     /// <summary>
     /// Initialize on Instantiation of the Gem
     /// </summary>
-    public void Initialize(float x, float y, GridManager grid, GemType gemType)
+    public void Initialize(int x, int y, GridManager grid, GemType gemType)
     {
         this.x = x;
         this.y = y;
@@ -100,5 +100,44 @@ public class GemBehaviour : MonoBehaviour
         {
             return false;
         }
+    }
+
+
+    /// <summary>
+    /// On Mouse Press - Equivalent of PointerClick/PointerDown
+    /// </summary>
+    private void OnMouseDown()
+    {
+        gridRef.PressGem(this);
+    }
+
+    /// <summary>
+    /// Mouse Enter is when cursor hovers on it
+    /// highlight it
+    /// </summary>
+    private void OnMouseEnter()
+    {
+        //GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
+        gridRef.EnteredGem(this);
+        gridRef.EnteredBorder(this);
+    }
+
+
+    /// <summary>
+    /// On Mouse Exit, remove highlight
+    /// </summary>
+
+    private void OnMouseExit()
+    {
+        //GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+        gridRef.ExitBorder(this);
+    }
+
+    /// <summary>
+    /// Mouse Up is when Click is released/ PointerUp
+    /// </summary>
+    private void OnMouseUp()
+    {
+        gridRef.ReleaseGem();
     }
 }
