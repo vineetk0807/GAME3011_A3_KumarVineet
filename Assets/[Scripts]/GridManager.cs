@@ -32,6 +32,11 @@ public class GridManager : MonoBehaviour
 
     public float fillInterval = 0.1f;
 
+    // Diagonal filling
+    private bool inverse = false;
+
+    public int[] difficultyBlockers;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -85,9 +90,15 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        // Test block functionality
-        Destroy(gemArray[4, 2].gameObject);
-        SpawnNewGem(4, 2, GemType.BLOCK);
+        // Test block functionality <- this involves complexity/difficulty of the game
+
+        // Difficulty Manager
+        if (GameManager.GetInstance().difficulty != Difficulty.EASY)
+        {
+            SpawnBlockers();
+        }
+        
+        // Spawn Blocking Pieces
 
         StartCoroutine(Fill());
 
@@ -109,12 +120,48 @@ public class GridManager : MonoBehaviour
             transform.position.y + (Y_GridDimensions / 2.0f) * GridFactor.y - y * GridFactor.y);
     }
 
+
+
+    // Spawn blockers as per difficulty
+    private void SpawnBlockers()
+    {
+        List<Vector2> blockedCoordinates1 = new List<Vector2>();
+        blockedCoordinates1 = GameManager.GetInstance().blockedCoordinates;
+
+        switch (GameManager.GetInstance().difficulty)
+        {
+            // 2 to 3 blockers
+            case Difficulty.NORMAL:
+                for (int i = 0; i < difficultyBlockers[0]; i++)
+                {
+                    int listIndex = Random.Range(0, blockedCoordinates1.Count);
+                    Destroy(gemArray[(int)blockedCoordinates1[listIndex].x, (int)blockedCoordinates1[listIndex].y].gameObject);
+                    SpawnNewGem((int)blockedCoordinates1[listIndex].x, (int)blockedCoordinates1[listIndex].y, GemType.BLOCK);
+                    blockedCoordinates1.RemoveAt(listIndex);
+                }
+                break;
+
+            // 5 to 6 blockers
+            case Difficulty.HARD:
+                for (int i = 0; i < difficultyBlockers[1]; i++)
+                {
+                    int listIndex = Random.Range(0, blockedCoordinates1.Count);
+                    Destroy(gemArray[(int)blockedCoordinates1[listIndex].x, (int)blockedCoordinates1[listIndex].y].gameObject);
+                    SpawnNewGem((int)blockedCoordinates1[listIndex].x, (int)blockedCoordinates1[listIndex].y, GemType.BLOCK);
+                    blockedCoordinates1.RemoveAt(listIndex);
+                }
+                break;
+        }
+        
+    }
+
+
     /// <summary>
     /// Spawn a new empty piece
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="type"></param>
+    /// <param name="x">i index</param>
+    /// <param name="y">j index</param>
+    /// <param name="type">gem type: empty, normal or block</param>
     /// <returns></returns>
     public GemBehaviour SpawnNewGem(int x, int y, GemType type)
     {
@@ -136,6 +183,8 @@ public class GridManager : MonoBehaviour
         // Every Fill piece has an interval time
         while (FillStep())
         {
+            // toggle it for every call
+            inverse = !inverse;
             yield return new WaitForSeconds(fillInterval);
         }
     }
@@ -152,8 +201,20 @@ public class GridManager : MonoBehaviour
         // bottom row can't be moved down, that's why -2, and not -1
         for (int y = Y_GridDimensions - 2; y >= 0; y--)
         {
-            for (int x = 0; x < X_GridDimensions; x++)
+            for (int loopX = 0; loopX < X_GridDimensions; loopX++)
             {
+                int x;
+
+                if (!inverse)
+                {
+                    x = loopX;
+                }
+                else
+                {
+                    x = X_GridDimensions - 1 - loopX;
+                }
+
+
                 GemBehaviour gem = gemArray[x, y];
 
                 if (gem.IsMovable())
@@ -170,6 +231,69 @@ public class GridManager : MonoBehaviour
                         gemArray[x, y + 1] = gem;
                         SpawnNewGem(x, y, GemType.EMPTY);
                         movedGem = true;
+                    }
+                    else
+                    {
+                        // For diagonal movement - loop 2 diagonals
+                        for (int dIndex = -1; dIndex <= 1; dIndex++)
+                        {
+                            if (dIndex != 0)
+                            {
+                                // move diagonally right using diagX (x coordinate)
+                                int diagX = x + dIndex;
+
+                                if (inverse)
+                                {
+                                    // move diagonally left
+                                    diagX = x - dIndex;
+                                }
+
+                                // Check if x coordinate is within the bounds
+                                if (diagX >= 0 && diagX < X_GridDimensions)
+                                {
+                                    // Get reference to that piece
+                                    GemBehaviour diagonalGem = gemArray[diagX, y + 1];
+
+                                    // check for empty
+                                    if (diagonalGem.type == GemType.EMPTY)
+                                    {
+                                        bool hasAPieceAbove = true;
+
+                                        for (int aboveY = y; aboveY >= 0; aboveY--)
+                                        {
+                                            GemBehaviour gemAbove = gemArray[diagX, aboveY];
+
+                                            // If movable, break, and fall down and fill the space
+                                            if (gemAbove.IsMovable())
+                                            {
+                                                break;
+                                            }
+                                            else
+                                            {
+
+                                                // Blocked
+                                                if (!gemAbove.IsMovable() && gemAbove.type != GemType.EMPTY)
+                                                {
+                                                    hasAPieceAbove = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        // Spawn normally
+                                        if (!hasAPieceAbove)
+                                        {
+                                            Destroy(diagonalGem.gameObject);
+                                            gem.movableComponent.Move(diagX, y + 1, fillInterval);
+                                            gemArray[diagX, y + 1] = gem;
+                                            SpawnNewGem(x, y, GemType.EMPTY);
+                                            movedGem = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -201,5 +325,14 @@ public class GridManager : MonoBehaviour
         }
 
         return movedGem;
+    }
+
+
+    /// <summary>
+    /// Reset functionality
+    /// </summary>
+    private void ResetGame()
+    {
+
     }
 }
