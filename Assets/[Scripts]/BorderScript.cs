@@ -69,6 +69,17 @@ public class BorderScript : MonoBehaviour
     /// </summary>
     public void BorderEnter()
     {
+        foreach (var border in gridRef.borderArray)
+        {
+            if (border == this)
+            {
+                continue;
+            }
+
+            border.spriteRenderer.sprite = normalBorder;
+            border.spriteRenderer.sortingOrder = (int)LayerOrder.NORMAL;
+        }
+
         spriteRenderer.sprite = highlightedBorder;
         spriteRenderer.sortingOrder = (int)LayerOrder.HIGHLIGHTED;
     }

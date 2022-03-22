@@ -161,5 +161,6 @@ public class GemBehaviour : MonoBehaviour
     private void OnMouseUp()
     {
         gridRef.ReleaseGem();
+        gridRef.ExitBorder(this);
     }
 }

@@ -33,7 +33,7 @@ public class GridManager : MonoBehaviour
     private GemBehaviour[,] gemArray;
 
     // Border Array
-    private BorderScript[,] borderArray;
+    public BorderScript[,] borderArray;
 
     [Header("Fill Interval")]
     public float fillInterval = 0.1f;
