@@ -1,0 +1,11 @@
+Name: Animated Match 3 Gems + Hue Shift Sprites Shaders
+Author: Allasstar
+Link: https://assetstore.unity.com/packages/2d/environments/animated-match-3-gems-hue-shift-sprites-shaders-62804#
+
+Name: Free Match 3 Game Assets
+Author: Craftpix.net
+Link: https://free-game-assets.itch.io/free-match-3-game-assets
+
+Name: Bomb Sprite
+Author: Pixel Frog
+Link: https://opengameart.org/content/kings-and-pigs

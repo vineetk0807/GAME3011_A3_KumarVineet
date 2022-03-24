@@ -794,6 +794,8 @@ public class GridManager : MonoBehaviour
             gemArray[x,y].clearComponent.ClearGem();
             SpawnNewGem(x, y, GemType.EMPTY);
 
+            //ClearBlockers(x, y);
+
             return true;
         }
 
@@ -831,6 +833,41 @@ public class GridManager : MonoBehaviour
         }
 
         return needsRefill;
+    }
+
+
+    /// <summary>
+    /// Clears blocking or obstacle gems
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    public void ClearBlockers(int x, int y)
+    {
+        // On X adjacent gems
+        for (int adjacentX = x - 1; adjacentX <= x + 1; adjacentX++)
+        {
+            if (adjacentX != x && adjacentX >= 0 && adjacentX < X_GridDimensions)
+            {
+                if (gemArray[adjacentX,y].type == GemType.BLOCK && gemArray[adjacentX,y].IsClearable())
+                {
+                    gemArray[adjacentX,y].clearComponent.ClearGem();
+                    SpawnNewGem(adjacentX, y, GemType.EMPTY);
+                }
+            }
+        }
+
+        // On Y adjacent gems
+        for (int adjacentY = y - 1; adjacentY <= y + 1; adjacentY++)
+        {
+            if (adjacentY != y && adjacentY >= 0 && adjacentY < Y_GridDimensions)
+            {
+                if (gemArray[x, adjacentY].type == GemType.BLOCK && gemArray[x, adjacentY].IsClearable())
+                {
+                    gemArray[x, adjacentY].clearComponent.ClearGem();
+                    SpawnNewGem(x, adjacentY, GemType.EMPTY);
+                }
+            }
+        }
     }
 
     // ---------------------------------------- Game management ---------------------------------------- //

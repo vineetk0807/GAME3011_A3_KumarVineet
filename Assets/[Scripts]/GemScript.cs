@@ -12,6 +12,7 @@ public enum GemType
     NORMAL,
     EMPTY,
     BLOCK,
+    BOMB,
     TOTAL_TYPES
 }
 
