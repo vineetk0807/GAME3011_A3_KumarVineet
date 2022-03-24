@@ -417,6 +417,20 @@ public class GridManager : MonoBehaviour
                     // After a gem swap, clear the valid matches
                     ClearAllValidMatches();
 
+                    // Set both gem to null for special powerups
+                    pressedGem = null;
+                    enteredGem = null;
+
+                    //// If either type is a powerup, clear it
+                    //if (gem1.type == GemType.BOMB)
+                    //{
+                    //    ClearGem(gem1.X, gem1.Y);
+                    //}
+                    //if (gem2.type == GemType.BOMB)
+                    //{
+                    //    ClearGem(gem2.X, gem2.Y);
+                    //}
+
                     // Update the Fill Coroutine if more matches are made
                     StartCoroutine(Fill());
                     break;
@@ -432,6 +446,20 @@ public class GridManager : MonoBehaviour
 
                         // After a gem swap, clear the valid matches
                         ClearAllValidMatches();
+
+                        // Set both gem to null for special powerups
+                        pressedGem = null;
+                        enteredGem = null;
+
+                        // If either type is a powerup, clear it
+                        //if (gem1.type == GemType.BOMB)
+                        //{
+                        //    ClearGem(gem1.X, gem1.Y);
+                        //}
+                        //if (gem2.type == GemType.BOMB)
+                        //{
+                        //    ClearGem(gem2.X, gem2.Y);
+                        //}
 
                         // Update the Fill Coroutine if more matches are made
                         StartCoroutine(Fill());
@@ -486,6 +514,11 @@ public class GridManager : MonoBehaviour
     public void PressGem(GemBehaviour gem)
     {
         pressedGem = gem;
+
+        if (gem.type == GemType.BOMB)
+        {
+           pressedGem.clearComponent.ClearGem();
+        }
     }
 
     /// <summary>
@@ -820,11 +853,45 @@ public class GridManager : MonoBehaviour
 
                     if (match != null)
                     {
+                        // POWER UP FUNCTION .. this code is not exactly needed as we have bomb to clear BOTH
+                        // Rows and Columns
+                        GemType powerUp = GemType.TOTAL_TYPES;
+                        GemBehaviour randomGem = match[Random.Range(0, match.Count)];
+                        int powerUpX = randomGem.X;
+                        int powerUpY = randomGem.Y;
+
+                        // Condition of spawning bomb
+                        if (match.Count >= 5)
+                        {
+                            powerUp = GemType.BOMB;
+                        }
+
+                        // Clear gem and refill
                         for (int i = 0; i < match.Count; i++)
                         {
                             if (ClearGem(match[i].X, match[i].Y))
                             {
                                 needsRefill = true;
+
+                                // If match is pressed or entered, determine the location of where to spawn the powerup
+                                if (match[i] == pressedGem || match[i] == enteredGem)
+                                {
+                                    powerUpX = match[i].X;
+                                    powerUpY = match[i].Y;
+                                }
+
+                            }
+                        }
+
+                        // If the power up type is set, it means spawn the powerup at the given location
+                        if (powerUp != GemType.TOTAL_TYPES)
+                        {
+                            Destroy(gemArray[powerUpX,powerUpY].gameObject);
+                            GemBehaviour gem = SpawnNewGem(powerUpX, powerUpY, powerUp);
+
+                            if (powerUp == GemType.BOMB)
+                            {
+                                gem.type = GemType.BOMB;
                             }
                         }
                     }
@@ -868,6 +935,29 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
+    }
+
+
+    /// <summary>
+    /// Clear Row and Column of the bomb
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="column"></param>
+    public void BombClearFunction(int row, int column)
+    {
+        for (int x = 0; x < X_GridDimensions; x++)
+        {
+            ClearGem(x, column);
+        }
+
+        for (int y = 0; y < Y_GridDimensions; y++)
+        {
+            ClearGem(row, y);
+        }
+
+        SpawnNewGem(row, column, GemType.EMPTY);
+        ClearAllValidMatches();
+        StartCoroutine(Fill());
     }
 
     // ---------------------------------------- Game management ---------------------------------------- //

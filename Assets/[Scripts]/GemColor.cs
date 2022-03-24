@@ -13,6 +13,7 @@ public class GemColor : MonoBehaviour
         QUAD,
         PENTA,
         OCTA,
+        BOMB,
         TOTAL_COLOR_TYPES
     }
 

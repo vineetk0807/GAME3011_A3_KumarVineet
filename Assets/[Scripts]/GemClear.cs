@@ -60,7 +60,7 @@ public class GemClear : MonoBehaviour
     /// <summary>
     /// Clear the gem
     /// </summary>
-    public void ClearGem()
+    public virtual void ClearGem()
     {
         isBeingCleared = true;
         StartCoroutine(ClearGemCoroutine());

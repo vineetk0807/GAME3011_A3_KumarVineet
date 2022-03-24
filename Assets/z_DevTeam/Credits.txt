@@ -9,3 +9,7 @@ Link: https://free-game-assets.itch.io/free-match-3-game-assets
 Name: Bomb Sprite
 Author: Pixel Frog
 Link: https://opengameart.org/content/kings-and-pigs
+
+Name: 2d Pixel Explosion
+Author: ColdOneK
+Link: https://opengameart.org/content/2d-pixel-explosion
