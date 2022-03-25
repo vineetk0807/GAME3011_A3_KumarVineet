@@ -45,7 +45,7 @@ public class BlockScript : MonoBehaviour
     {
         if (_animator)
         {
-            Debug.Log("block name: " + gameObject.name);
+            //Debug.Log("block name: " + gameObject.name);
 
             _animator.SetBool(isExploding,true);
 
@@ -63,5 +63,6 @@ public class BlockScript : MonoBehaviour
     {
         isBeingCleared = true;
         StartCoroutine(ClearGemCoroutine());
+        GameManager.GetInstance().UpdatePoints(250);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -83,6 +84,13 @@ public class GameManager : MonoBehaviour
     public bool isGameOver = false;
 
 
+    [Header("UI")] 
+    public TextMeshProUGUI points_TMP;
+    public TextMeshProUGUI timer_TMP;
+    public TextMeshProUGUI difficulty_TMP;
+    public TextMeshProUGUI moves_TMP;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -106,6 +114,27 @@ public class GameManager : MonoBehaviour
         EndScreenPanel.SetActive(false);
         isGameOver = false;
         hasWon = false;
+
+        switch (difficulty)
+        {
+            case Difficulty.EASY:
+                difficulty_TMP.text = "Easy";
+                break;
+
+            case Difficulty.NORMAL:
+                difficulty_TMP.text = "Normal";
+                break;
+
+            case Difficulty.HARD:
+                difficulty_TMP.text = "Hard";
+                break;
+        }
+
+        // Setting TMPs
+        points_TMP.text = points.ToString();
+        moves_TMP.text = numberOfMovesRemaining.ToString();
+        timer_TMP.text = timeRemaining.ToString();
+
     }
 
 
@@ -128,6 +157,9 @@ public class GameManager : MonoBehaviour
         {
             currentTime = Time.time;
             timeRemaining -= 1;
+
+            // Update text
+            timer_TMP.text = timeRemaining.ToString();
 
             // based on timer - game over
             if (timeRemaining <= 0)
@@ -266,15 +298,24 @@ public class GameManager : MonoBehaviour
             Debug.Log("Done !");
             hasWon = true;
             isGameOver = true;
-            EndScreenPanel.SetActive(true);
+            StartCoroutine(EndScreenWithDelay(2f));
         }
     }
 
+    IEnumerator EndScreenWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        EndScreenPanel.SetActive(true);
+    }
 
+
+    /// <summary>
+    /// Updates moves
+    /// </summary>
     public void MovesUpdate()
     {
         numberOfMovesRemaining--;
-
+        moves_TMP.text = numberOfMovesRemaining.ToString();
         if (numberOfMovesRemaining <= 0)
         {
             isGameOver = true;
@@ -290,6 +331,8 @@ public class GameManager : MonoBehaviour
     public void UpdatePoints(int points)
     {
         this.points += points;
+        points_TMP.text = this.points.ToString();
+
     }
 
     /// <summary>

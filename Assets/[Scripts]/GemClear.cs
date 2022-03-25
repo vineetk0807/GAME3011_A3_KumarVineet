@@ -70,6 +70,7 @@ public class GemClear : MonoBehaviour
         {
             // Gem list
             GameManager.GetInstance().GemsTakenUpdate(gem.colorComponent.Color);
+            GameManager.GetInstance().UpdatePoints(10);
         }
     }
 

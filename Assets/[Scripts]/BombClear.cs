@@ -56,5 +56,6 @@ public class BombClear : MonoBehaviour
         gem.gridRef.BombClearFunction(gem.X, gem.Y);
         isBeingCleared = true;
         StartCoroutine(ExplodeGemCoroutine());
+        GameManager.GetInstance().UpdatePoints(500);
     }
 }

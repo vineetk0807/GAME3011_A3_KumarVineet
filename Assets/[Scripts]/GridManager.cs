@@ -1002,7 +1002,7 @@ public class GridManager : MonoBehaviour
                 {
                     gemArray[row, y].gameObject.GetComponent<BlockScript>().ClearGem();
                     SpawnNewGem(row, y, GemType.EMPTY);
-                    Debug.Log("In Block, column");
+                    //Debug.Log("In Block, column");
                 }
                 else
                 {
