@@ -96,5 +96,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridRef: {fileID: 0}
-  normalBorder: {fileID: 21300000, guid: 6533c3551eade7b4a972c43db8b9338d, type: 3}
-  highlightedBorder: {fileID: 21300000, guid: bd345be38a9d7fd438e008b0fd91bf5b, type: 3}
+  normalBorder: {fileID: 21300000, guid: 86342a382f6f3a64bb8dbdf636ce0b23, type: 3}
+  highlightedBorder: {fileID: 21300000, guid: 5e264fd0d8a944b4eb9681d9cf15c27c, type: 3}

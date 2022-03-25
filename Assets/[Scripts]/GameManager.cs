@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 /// <summary>
@@ -50,7 +51,18 @@ public class GameManager : MonoBehaviour
     private int points = 0;
 
     public List<int> GemsTaken;
+    public List<int> GemsObjective;
 
+    [Header("Total GemsTypes as Objectives")]
+    public int objectiveEasyNormal = 2;
+    public int objectiveHard = 3;
+    private int objectivesRemaining;
+
+    [Header("Total Gems to Collect")]
+    public int totalGemsToCollectEasyNormal = 25;
+    public int totalGemsToCollectHard = 40;
+
+    [Header("Moves Remaining")]
     public int numberOfMovesRemaining = 10;
     public int easyMoveCount;
     public int normalMoveCount;
@@ -65,22 +77,46 @@ public class GameManager : MonoBehaviour
     public int timeRemaining;
     public List<int> difficultyBasedTime;
 
+    [Header("End Screen")] 
+    public GameObject EndScreenPanel;
+    public bool hasWon = false;
+    public bool isGameOver = false;
+
 
     // Start is called before the first frame update
     void Start()
     {
         GemsTaken = new List<int>();
+        GemsObjective = new List<int>();
         InitializeGemList();
         SetNumberOfMoves();
 
         timeRemaining = difficultyBasedTime[(int)difficulty];
+
+        if (difficulty == Difficulty.EASY || difficulty == Difficulty.NORMAL)
+        {
+            objectivesRemaining = objectiveEasyNormal;
+        }
+        else
+        {
+            objectivesRemaining = objectiveHard;
+        }
+
+        // disable end screen panel
+        EndScreenPanel.SetActive(false);
+        isGameOver = false;
+        hasWon = false;
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        UpdateTimer();
+        if (!isGameOver)
+        {
+            UpdateTimer();
+        }
+        
     }
 
     /// <summary>
@@ -92,6 +128,14 @@ public class GameManager : MonoBehaviour
         {
             currentTime = Time.time;
             timeRemaining -= 1;
+
+            // based on timer - game over
+            if (timeRemaining <= 0)
+            {
+                isGameOver = true;
+                EndScreenPanel.SetActive(true);
+                EndScreenPanel.GetComponent<EndScreenManager>().EndScreenText.text = "You ran out of time !!";
+            }
         }
     }
 
@@ -128,8 +172,115 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < (int)GemColor.ColorType.TOTAL_COLOR_TYPES - 1; i++)
         {
             GemsTaken.Add(0);
+            GemsObjective.Add(i);
         }
-       
+
+
+        // Add Objective - 2 gems to collect for easy and normal, 3 for hard
+        
+        switch (difficulty)
+        {
+            case Difficulty.EASY:
+            case Difficulty.NORMAL:
+                for (int i = 0; i < (int)GemColor.ColorType.TOTAL_COLOR_TYPES - 1 - objectiveEasyNormal; i++)
+                {
+                    GemsObjective.RemoveAt(Random.Range(0, GemsObjective.Count));
+                }
+                break;
+
+
+            case Difficulty.HARD:
+                for (int i = 0; i < (int)GemColor.ColorType.TOTAL_COLOR_TYPES - 1 - objectiveHard; i++)
+                {
+                    GemsObjective.RemoveAt(Random.Range(0, GemsObjective.Count));
+                }
+                break;
+        }
+
+        UIManager.GetInstance().InitializeUIManager();
+
+    }
+
+
+    /// <summary>
+    /// Gems Take increment
+    /// </summary>
+    /// <param name="color"></param>
+    public void GemsTakenUpdate(GemColor.ColorType color)
+    {
+        GemsTaken[(int)color]++;
+        
+        // Update UI Text
+        bool toReturn = true;
+        
+        foreach (var gem in GemsObjective)
+        {
+            if ((int)color == gem)
+            {
+                toReturn = false;
+            }
+        }
+
+        if (toReturn)
+        {
+            return;
+        }
+
+        int remaining = 0;
+        switch (difficulty)
+        {
+            case Difficulty.EASY:
+            case Difficulty.NORMAL:
+                remaining = totalGemsToCollectEasyNormal - GemsTaken[(int)color];
+                if (remaining <= 0 && GemsObjective.Contains(((int)color)))
+                {
+                    UIManager.GetInstance().GemsCollected[(int)color].AllGemsCollected();
+                    GemsObjective.Remove((int)color);
+                }
+                else
+                {
+                    UIManager.GetInstance().GemsCollected[(int)color].Count.text = remaining.ToString();
+                }
+                
+                break;
+
+            case Difficulty.HARD:
+                remaining = totalGemsToCollectHard - GemsTaken[(int)color];
+
+                if (remaining <= 0 && GemsObjective.Contains(((int)color)))
+                {
+                    UIManager.GetInstance().GemsCollected[(int)color].AllGemsCollected();
+                    GemsObjective.Remove((int)color);
+                }
+                else
+                {
+                    UIManager.GetInstance().GemsCollected[(int)color].Count.text = remaining.ToString();
+                }
+                
+                break;
+        }
+
+        // Game done
+        if (GemsObjective.Count <= 0)
+        {
+            Debug.Log("Done !");
+            hasWon = true;
+            isGameOver = true;
+            EndScreenPanel.SetActive(true);
+        }
+    }
+
+
+    public void MovesUpdate()
+    {
+        numberOfMovesRemaining--;
+
+        if (numberOfMovesRemaining <= 0)
+        {
+            isGameOver = true;
+            hasWon = false;
+            EndScreenPanel.SetActive(true);
+        }
     }
 
     /// <summary>
@@ -154,6 +305,11 @@ public class GameManager : MonoBehaviour
         {
             GemsTaken[i] = 0;
         }
+
+        // End Screen
+        EndScreenPanel.SetActive(false);
+        hasWon = false;
+        isGameOver = false;
     }
 
     /// <summary>

@@ -152,7 +152,7 @@ public class GridManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Count = " + transform.childCount);
+        //Debug.Log("Count = " + transform.childCount);
     }
 
     // Get world position with x and y grid factor for offset
@@ -478,7 +478,7 @@ public class GridManager : MonoBehaviour
                         StartCoroutine(Fill());
 
                         // Update number of moves
-                        GameManager.GetInstance().numberOfMovesRemaining--;
+                        GameManager.GetInstance().MovesUpdate();
                     }
                     else
                     {

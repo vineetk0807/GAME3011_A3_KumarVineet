@@ -130,7 +130,7 @@ public class GemBehaviour : MonoBehaviour
     /// </summary>
     private void OnMouseDown()
     {
-        if (GameManager.GetInstance().numberOfMovesRemaining > 0)
+        if (!GameManager.GetInstance().isGameOver)
         {
             gridRef.PressGem(this);
         }
@@ -142,9 +142,13 @@ public class GemBehaviour : MonoBehaviour
     /// </summary>
     private void OnMouseEnter()
     {
-        //GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
-        gridRef.EnteredGem(this);
-        gridRef.EnteredBorder(this);
+        if (!GameManager.GetInstance().isGameOver)
+        {
+            //GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
+            gridRef.EnteredGem(this);
+            gridRef.EnteredBorder(this);
+        }
+            
     }
 
 
@@ -154,8 +158,11 @@ public class GemBehaviour : MonoBehaviour
 
     private void OnMouseExit()
     {
-        //GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
-        gridRef.ExitBorder(this);
+        if (!GameManager.GetInstance().isGameOver)
+        {
+            //GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+            gridRef.ExitBorder(this);
+        }
     }
 
     /// <summary>
@@ -163,7 +170,10 @@ public class GemBehaviour : MonoBehaviour
     /// </summary>
     private void OnMouseUp()
     {
-        gridRef.ReleaseGem();
-        gridRef.ExitBorder(this);
+        if (!GameManager.GetInstance().isGameOver)
+        {
+            gridRef.ReleaseGem();
+            gridRef.ExitBorder(this);
+        }
     }
 }
