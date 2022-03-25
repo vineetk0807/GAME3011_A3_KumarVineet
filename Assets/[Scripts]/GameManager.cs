@@ -90,6 +90,10 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI difficulty_TMP;
     public TextMeshProUGUI moves_TMP;
 
+    [Header("Colors")] 
+    public Color lessTimeMovesRedColor;
+    public Color scoreColor;
+    public Color bonusScore;
 
     // Start is called before the first frame update
     void Start()
@@ -133,7 +137,18 @@ public class GameManager : MonoBehaviour
         // Setting TMPs
         points_TMP.text = points.ToString();
         moves_TMP.text = numberOfMovesRemaining.ToString();
+
+        if (difficulty == Difficulty.EASY)
+        {
+            moves_TMP.text = "LOL";
+        }
+        
+
         timer_TMP.text = timeRemaining.ToString();
+
+
+        // Set Color
+        points_TMP.color = scoreColor;
 
     }
 
@@ -157,6 +172,11 @@ public class GameManager : MonoBehaviour
         {
             currentTime = Time.time;
             timeRemaining -= 1;
+
+            if (timeRemaining < 15)
+            {
+                timer_TMP.color = lessTimeMovesRedColor;
+            }
 
             // Update text
             timer_TMP.text = timeRemaining.ToString();
@@ -315,6 +335,12 @@ public class GameManager : MonoBehaviour
     public void MovesUpdate()
     {
         numberOfMovesRemaining--;
+
+        if (numberOfMovesRemaining < 5)
+        {
+            moves_TMP.color = lessTimeMovesRedColor;
+        }
+
         moves_TMP.text = numberOfMovesRemaining.ToString();
         if (numberOfMovesRemaining <= 0)
         {
@@ -330,9 +356,36 @@ public class GameManager : MonoBehaviour
     /// <param name="points"></param>
     public void UpdatePoints(int points)
     {
+
+        if (points > 200)
+        {
+            StartCoroutine(BonusPoints(1));
+        }
+
         this.points += points;
         points_TMP.text = this.points.ToString();
+    }
 
+
+    IEnumerator BonusPoints(float interval)
+    {
+        points_TMP.color = bonusScore;
+        float timer = 0.0f;
+        float scaleValue = 4f;
+        points_TMP.rectTransform.localScale = new Vector3(scaleValue, scaleValue,1f);
+        // Perform Fade-Out using the provided delay
+        while (timer < interval)
+        {
+            timer += Time.deltaTime;
+
+            // Smooth step function to lerp smoothly
+            scaleValue = Mathf.SmoothStep(scaleValue, 1.0f, timer / interval);
+            points_TMP.rectTransform.localScale = new Vector3(scaleValue, scaleValue, 1f);
+            yield return new WaitForEndOfFrame();
+        }
+
+        points_TMP.rectTransform.localScale = new Vector3(1f, 1f, 1f);
+        points_TMP.color = scoreColor;
     }
 
     /// <summary>

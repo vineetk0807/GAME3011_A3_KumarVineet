@@ -13,3 +13,24 @@ Link: https://opengameart.org/content/kings-and-pigs
 Name: 2d Pixel Explosion
 Author: ColdOneK
 Link: https://opengameart.org/content/2d-pixel-explosion
+
+Name: Buttons Set
+Author: KartInnka
+Link: https://assetstore.unity.com/packages/2d/gui/buttons-set-211824#publisher
+
+#####
+Fonts
+
+Name: Candy Beans Font
+Author: Chequered Ink
+Link: https://www.1001freefonts.com/candy-beans.font
+
+Name: Strawberry Muffins Font
+Author: Misti's Fonts
+Link: https://www.1001freefonts.com/strawberry-muffins.font
+
+Name: Organo Font
+Author: Nikola Nikolov
+Link: https://www.1001freefonts.com/organo.font
+
+
