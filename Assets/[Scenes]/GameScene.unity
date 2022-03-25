@@ -172,7 +172,9 @@ MonoBehaviour:
   easyMoveCount: 10
   normalMoveCount: 8
   hardMoveCount: 5
-  difficulty: 1
+  difficulty: 0
+  timeRemaining: 0
+  difficultyBasedTime: 3c0000001e0000001e000000
 --- !u!1 &848506802
 GameObject:
   m_ObjectHideFlags: 0

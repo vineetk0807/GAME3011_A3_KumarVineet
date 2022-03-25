@@ -59,19 +59,40 @@ public class GameManager : MonoBehaviour
     // difficulty to set
     public Difficulty difficulty;
 
+    // Time
+    private float currentTime = 0f;
+    [Header("Timer")]
+    public int timeRemaining;
+    public List<int> difficultyBasedTime;
+
+
     // Start is called before the first frame update
     void Start()
     {
         GemsTaken = new List<int>();
         InitializeGemList();
         SetNumberOfMoves();
+
+        timeRemaining = difficultyBasedTime[(int)difficulty];
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        
+        UpdateTimer();
+    }
+
+    /// <summary>
+    /// Updates timer
+    /// </summary>
+    private void UpdateTimer()
+    {
+        if (Time.time - currentTime >= 1)
+        {
+            currentTime = Time.time;
+            timeRemaining -= 1;
+        }
     }
 
     /// <summary>
