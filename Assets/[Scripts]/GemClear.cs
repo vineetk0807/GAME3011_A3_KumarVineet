@@ -65,6 +65,9 @@ public class GemClear : MonoBehaviour
     {
         isBeingCleared = true;
         StartCoroutine(ClearGemCoroutine());
+
+        // Gem list
+        GameManager.GetInstance().GemsTaken[(int)gem.colorComponent.Color]++;
     }
 
     private IEnumerator ExplodeGemCoroutine()
@@ -83,5 +86,8 @@ public class GemClear : MonoBehaviour
     {
         isBeingCleared = true;
         StartCoroutine(ExplodeGemCoroutine());
+
+        // Gem list
+        GameManager.GetInstance().GemsTaken[(int)gem.colorComponent.Color]++;
     }
 }

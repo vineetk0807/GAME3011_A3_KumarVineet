@@ -167,7 +167,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockedCoordinates: []
-  difficulty: 2
+  GemsTaken: 
+  numberOfMovesRemaining: 10
+  easyMoveCount: 10
+  normalMoveCount: 8
+  hardMoveCount: 5
+  difficulty: 1
 --- !u!1 &848506802
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,6 +427,7 @@ MonoBehaviour:
   matchNumber: 3
   matchNumber_EasyNormal: 3
   matchNumber_Hard: 3
+  firstMove: 0
 --- !u!1 &2015318743
 GameObject:
   m_ObjectHideFlags: 0

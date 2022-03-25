@@ -476,6 +476,9 @@ public class GridManager : MonoBehaviour
 
                         // Update the Fill Coroutine if more matches are made
                         StartCoroutine(Fill());
+
+                        // Update number of moves
+                        GameManager.GetInstance().numberOfMovesRemaining--;
                     }
                     else
                     {

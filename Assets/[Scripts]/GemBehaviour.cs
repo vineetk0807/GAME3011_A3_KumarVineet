@@ -130,7 +130,10 @@ public class GemBehaviour : MonoBehaviour
     /// </summary>
     private void OnMouseDown()
     {
-        gridRef.PressGem(this);
+        if (GameManager.GetInstance().numberOfMovesRemaining > 0)
+        {
+            gridRef.PressGem(this);
+        }
     }
 
     /// <summary>

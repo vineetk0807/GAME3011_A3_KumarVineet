@@ -18,6 +18,12 @@ public enum Difficulty
     HARD
 }
 
+//STAR,
+//HEART,
+//QUAD,
+//PENTA,
+//OCTA,
+
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
@@ -41,7 +47,14 @@ public class GameManager : MonoBehaviour
         LoadBlockedCoordinates();
     }
 
-    
+    private int points = 0;
+
+    public List<int> GemsTaken;
+
+    public int numberOfMovesRemaining = 10;
+    public int easyMoveCount;
+    public int normalMoveCount;
+    public int hardMoveCount;
 
     // difficulty to set
     public Difficulty difficulty;
@@ -49,8 +62,11 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        GemsTaken = new List<int>();
+        InitializeGemList();
+        SetNumberOfMoves();
     }
+
 
     // Update is called once per frame
     void Update()
@@ -58,6 +74,66 @@ public class GameManager : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Set number of moves based on difficulty
+    /// </summary>
+    private void SetNumberOfMoves()
+    {
+        switch (difficulty)
+        {
+            case Difficulty.EASY:
+                numberOfMovesRemaining = easyMoveCount;
+                break;
+
+            case Difficulty.NORMAL:
+                numberOfMovesRemaining = normalMoveCount;
+                break;
+
+            case Difficulty.HARD:
+                numberOfMovesRemaining = hardMoveCount;
+                break;
+
+            default:
+                numberOfMovesRemaining = normalMoveCount;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initialize the gem list
+    /// </summary>
+    public void InitializeGemList()
+    {
+        for (int i = 0; i < (int)GemColor.ColorType.TOTAL_COLOR_TYPES - 1; i++)
+        {
+            GemsTaken.Add(0);
+        }
+       
+    }
+
+    /// <summary>
+    /// Update points
+    /// </summary>
+    /// <param name="points"></param>
+    public void UpdatePoints(int points)
+    {
+        this.points += points;
+    }
+
+    /// <summary>
+    /// Resets game
+    /// </summary>
+    public void ResetGame()
+    {
+        // Points
+        points = 0;
+
+        // Gems
+        for (int i = 0; i < GemsTaken.Count; i++)
+        {
+            GemsTaken[i] = 0;
+        }
+    }
 
     /// <summary>
     /// Loads blocked coordinates
