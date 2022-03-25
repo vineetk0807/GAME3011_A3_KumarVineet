@@ -530,7 +530,7 @@ public class GridManager : MonoBehaviour
 
         if (gem.type == GemType.BOMB)
         {
-           pressedGem.clearComponent.ClearGem();
+           pressedGem.GetComponent<BombClear>().ExplodeGem();
         }
     }
 
@@ -977,11 +977,12 @@ public class GridManager : MonoBehaviour
         {
             if (x != column)
             {
-                if (gemArray[x, column].type == GemType.BLOCK)
+                if (gemArray[x, column].gameObject.GetComponent<BlockScript>())
                 {
                     gemArray[x,column].gameObject.GetComponent<BlockScript>().ClearGem();
                     SpawnNewGem(x, column, GemType.EMPTY);
                     Debug.Log("In Block, row");
+
                 }
                 else
                 {
@@ -994,7 +995,7 @@ public class GridManager : MonoBehaviour
         {
             if (y != row)
             {
-                if (gemArray[row, y].type == GemType.BLOCK)
+                if (gemArray[row, y].gameObject.GetComponent<BlockScript>())
                 {
                     gemArray[row, y].gameObject.GetComponent<BlockScript>().ClearGem();
                     SpawnNewGem(row, y, GemType.EMPTY);
