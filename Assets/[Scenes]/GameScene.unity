@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockedCoordinates: []
-  difficulty: 1
+  difficulty: 2
 --- !u!1 &848506802
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,7 +421,7 @@ MonoBehaviour:
   difficultyBlockers: 0300000006000000
   matchNumber: 3
   matchNumber_EasyNormal: 3
-  matchNumber_Hard: 4
+  matchNumber_Hard: 3
 --- !u!1 &2015318743
 GameObject:
   m_ObjectHideFlags: 0

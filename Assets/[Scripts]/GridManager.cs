@@ -55,7 +55,12 @@ public class GridManager : MonoBehaviour
     [Header("Match number on Difficulty")]
     public int matchNumber = 3;
     public int matchNumber_EasyNormal = 3;
-    public int matchNumber_Hard = 4;
+    public int matchNumber_Hard = 3;
+
+
+    // First move determines if player has actually moved a gem.
+    // POWERUP WILL NOT COME AUTOMATICALLY
+    public bool firstMove = false;
 
     // Start is called before the first frame update
     void Start()
@@ -140,12 +145,14 @@ public class GridManager : MonoBehaviour
 
         // Set Grid starting position
         //transform.position = GridStartPosition;
+
+        firstMove = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        Debug.Log("Count = " + transform.childCount);
     }
 
     // Get world position with x and y grid factor for offset
@@ -397,6 +404,12 @@ public class GridManager : MonoBehaviour
     /// <param name="gem2"></param>
     public void SwapGem(GemBehaviour gem1, GemBehaviour gem2)
     {
+        // Set a first move
+        if (!firstMove)
+        {
+            firstMove = true;
+        }
+
         if (gem1.IsMovable() && gem2.IsMovable())
         {
             // Swap them
@@ -418,10 +431,10 @@ public class GridManager : MonoBehaviour
                     ClearAllValidMatches();
 
                     // Set both gem to null for special powerups
-                    pressedGem = null;
-                    enteredGem = null;
+                    //pressedGem = null;
+                    //enteredGem = null;
 
-                    //// If either type is a powerup, clear it
+                    // If either type is a powerup, clear it
                     //if (gem1.type == GemType.BOMB)
                     //{
                     //    ClearGem(gem1.X, gem1.Y);
@@ -448,8 +461,8 @@ public class GridManager : MonoBehaviour
                         ClearAllValidMatches();
 
                         // Set both gem to null for special powerups
-                        pressedGem = null;
-                        enteredGem = null;
+                        //pressedGem = null;
+                        //enteredGem = null;
 
                         // If either type is a powerup, clear it
                         //if (gem1.type == GemType.BOMB)
@@ -676,7 +689,7 @@ public class GridManager : MonoBehaviour
                             matchingGemsList.Add(matchedGem);
                         }
 
-                        Debug.Log("Horizontal Swap, Vertical L or T match !!!");
+                        //Debug.Log("Horizontal Swap, Vertical L or T match !!!");
 
                         break;
                     }
@@ -795,7 +808,7 @@ public class GridManager : MonoBehaviour
                             matchingGemsList.Add(matchedGem);
                         }
 
-                        Debug.Log("Vertical Swap, Horizontal L or T match !!!");
+                       // Debug.Log("Vertical Swap, Horizontal L or T match !!!");
                         break;
                     }
                 }
@@ -819,13 +832,23 @@ public class GridManager : MonoBehaviour
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    public bool ClearGem(int x, int y)
+    public bool ClearGem(int x, int y, bool isExploding)
     {
         // If clearable and not already clearing
         if (gemArray[x, y].IsClearable() && !gemArray[x, y].clearComponent.IsBeingCleared)
         {
-            gemArray[x,y].clearComponent.ClearGem();
-            SpawnNewGem(x, y, GemType.EMPTY);
+            if (isExploding)
+            {
+                gemArray[x, y].clearComponent.ExplodeGem();
+                SpawnNewGem(x, y, GemType.EMPTY);
+            }
+            else
+            {
+                gemArray[x, y].clearComponent.ClearGem();
+                SpawnNewGem(x, y, GemType.EMPTY);
+            }
+
+            
 
             //ClearBlockers(x, y);
 
@@ -861,7 +884,9 @@ public class GridManager : MonoBehaviour
                         int powerUpY = randomGem.Y;
 
                         // Condition of spawning bomb
-                        if (match.Count >= 5)
+                        // First move determines if player has actually moved a gem.
+                        // POWERUP WILL NOT COME AUTOMATICALLY
+                        if (match.Count >= 5 && firstMove)
                         {
                             powerUp = GemType.BOMB;
                         }
@@ -869,7 +894,7 @@ public class GridManager : MonoBehaviour
                         // Clear gem and refill
                         for (int i = 0; i < match.Count; i++)
                         {
-                            if (ClearGem(match[i].X, match[i].Y))
+                            if (ClearGem(match[i].X, match[i].Y, false))
                             {
                                 needsRefill = true;
 
@@ -945,19 +970,65 @@ public class GridManager : MonoBehaviour
     /// <param name="column"></param>
     public void BombClearFunction(int row, int column)
     {
+        bool isExploding = true;
+        SpawnNewGem(row, column,GemType.EMPTY);
+
         for (int x = 0; x < X_GridDimensions; x++)
         {
-            ClearGem(x, column);
+            if (x != column)
+            {
+                if (gemArray[x, column].type == GemType.BLOCK)
+                {
+                    gemArray[x,column].gameObject.GetComponent<BlockScript>().ClearGem();
+                    SpawnNewGem(x, column, GemType.EMPTY);
+                    Debug.Log("In Block, row");
+                }
+                else
+                {
+                    ClearGem(x, column, isExploding);
+                }
+            }
         }
 
         for (int y = 0; y < Y_GridDimensions; y++)
         {
-            ClearGem(row, y);
+            if (y != row)
+            {
+                if (gemArray[row, y].type == GemType.BLOCK)
+                {
+                    gemArray[row, y].gameObject.GetComponent<BlockScript>().ClearGem();
+                    SpawnNewGem(row, y, GemType.EMPTY);
+                    Debug.Log("In Block, column");
+                }
+                else
+                {
+                    ClearGem(row, y, isExploding);
+                }
+            }
         }
 
-        SpawnNewGem(row, column, GemType.EMPTY);
         ClearAllValidMatches();
         StartCoroutine(Fill());
+        
+        //for (int x = 0; x < X_GridDimensions; x++)
+        //{
+        //    if (x != column)
+        //    {
+        //        ClearGem(x, column);
+        //    }
+        //}
+
+        //for (int y = 0; y < Y_GridDimensions; y++)
+        //{
+        //    if (y != row)
+        //    {
+        //        gemArray[row, y].clearComponent.ClearGem();
+        //        SpawnNewGem(row, y, GemType.EMPTY);
+        //    }
+        //}
+
+        //ClearAllValidMatches();
+        //StartCoroutine(Fill());
     }
 
     // ---------------------------------------- Game management ---------------------------------------- //

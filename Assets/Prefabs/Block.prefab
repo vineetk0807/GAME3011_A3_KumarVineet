@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4889175362019799480}
   - component: {fileID: 7209017919078516336}
   - component: {fileID: -6069778058579984431}
-  - component: {fileID: 9042038483629717869}
+  - component: {fileID: -3269445306853353528}
   m_Layer: 0
   m_Name: Block
   m_TagString: Untagged
@@ -135,7 +135,7 @@ MonoBehaviour:
   movableComponent: {fileID: 0}
   colorComponent: {fileID: 0}
   clearComponent: {fileID: 0}
---- !u!114 &9042038483629717869
+--- !u!114 &-3269445306853353528
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,8 +144,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 4889175362019799479}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bf555d70ff87f0449f9bae220779e58, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e24e338d65dd6f48bce5c05f26dc082, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sample: {fileID: 0}
-  AnimationDuration: 1.2

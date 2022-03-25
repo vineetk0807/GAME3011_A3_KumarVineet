@@ -1,18 +1,14 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GemClear : MonoBehaviour
+public class BlockScript : MonoBehaviour
 {
     // Animator Controller key
-    public readonly int isMatched = Animator.StringToHash("IsMatched");
-    public readonly int isRotating = Animator.StringToHash("IsRotating");
     public readonly int isExploding = Animator.StringToHash("IsExploding");
 
     // Animator component
     private Animator _animator;
-    public AnimationClip Sample;
 
     private bool isBeingCleared = false;
 
@@ -49,7 +45,9 @@ public class GemClear : MonoBehaviour
     {
         if (_animator)
         {
-            _animator.SetBool(isMatched,true);
+            Debug.Log("block name: " + gameObject.name);
+
+            _animator.SetBool(isExploding,true);
 
             yield return new WaitForSeconds(AnimationDuration);
 
@@ -61,27 +59,9 @@ public class GemClear : MonoBehaviour
     /// <summary>
     /// Clear the gem
     /// </summary>
-    public virtual void ClearGem()
+    public void ClearGem()
     {
         isBeingCleared = true;
         StartCoroutine(ClearGemCoroutine());
-    }
-
-    private IEnumerator ExplodeGemCoroutine()
-    {
-        if (_animator)
-        {
-            _animator.SetBool(isExploding, true);
-
-            yield return new WaitForSeconds(AnimationDuration);
-
-            Destroy(gameObject);
-        }
-    }
-
-    public void ExplodeGem()
-    {
-        isBeingCleared = true;
-        StartCoroutine(ExplodeGemCoroutine());
     }
 }
