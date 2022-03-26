@@ -34,3 +34,9 @@ Author: Nikola Nikolov
 Link: https://www.1001freefonts.com/organo.font
 
 
+####
+Sounds
+Name: 9 explosion sounds
+Author: Unnamed
+Link: https://opengameart.org/content/9-explosion-sounds
+

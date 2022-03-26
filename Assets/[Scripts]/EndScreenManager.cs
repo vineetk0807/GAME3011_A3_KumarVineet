@@ -9,11 +9,12 @@ public class EndScreenManager : MonoBehaviour
 {
 
     public TextMeshProUGUI EndScreenText;
+    public TextMeshProUGUI ScoreText_TMP;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        ScoreText_TMP.text = Data.Score.ToString();
     }
 
     private void OnEnable()

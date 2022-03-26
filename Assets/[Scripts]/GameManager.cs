@@ -100,6 +100,10 @@ public class GameManager : MonoBehaviour
     {
         GemsTaken = new List<int>();
         GemsObjective = new List<int>();
+
+        // Set difficulty
+        difficulty = Data.difficulty;
+
         InitializeGemList();
         SetNumberOfMoves();
 
@@ -318,6 +322,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Done !");
             hasWon = true;
             isGameOver = true;
+            EndScreenPanel.GetComponent<EndScreenManager>().EndScreenText.text = "You have won!";
             StartCoroutine(EndScreenWithDelay(2f));
         }
     }
@@ -346,6 +351,7 @@ public class GameManager : MonoBehaviour
         {
             isGameOver = true;
             hasWon = false;
+            EndScreenPanel.GetComponent<EndScreenManager>().EndScreenText.text = "You ran out of moves !!";
             EndScreenPanel.SetActive(true);
         }
     }
@@ -363,6 +369,7 @@ public class GameManager : MonoBehaviour
         }
 
         this.points += points;
+        Data.Score = this.points;
         points_TMP.text = this.points.ToString();
     }
 
