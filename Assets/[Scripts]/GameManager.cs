@@ -164,7 +164,24 @@ public class GameManager : MonoBehaviour
         {
             UpdateTimer();
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EndGame();
+        }
         
+    }
+
+    /// <summary>
+    /// Quit game functionality
+    /// </summary>
+    public void EndGame()
+    {
+        #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
     }
 
     /// <summary>
