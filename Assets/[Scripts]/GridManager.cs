@@ -484,7 +484,8 @@ public class GridManager : MonoBehaviour
                     {
                         // If not match, then swap, and swap back
                         StartCoroutine(NoMatchSwapBackGem(gem1, gem2));
-
+                        SFXManager.GetInstance().audioSrc.clip = SFXManager.GetInstance().SFX_gemMoveNotAllowed;
+                        SFXManager.GetInstance().audioSrc.Play();
                         // return them back to their original position
                         gemArray[gem1.X, gem1.Y] = gem1;
                         gemArray[gem2.X, gem2.Y] = gem2;
@@ -512,6 +513,7 @@ public class GridManager : MonoBehaviour
 
         yield return new WaitForSeconds(SwapBackInterval);
 
+        
         gemArray[gem1.X, gem1.Y] = gem1;
         gemArray[gem2.X, gem2.Y] = gem2;
 
@@ -702,6 +704,8 @@ public class GridManager : MonoBehaviour
             // Return the matching list
             if (matchingGemsList.Count >= matchNumber)
             {
+                SFXManager.GetInstance().audioSrc.clip = SFXManager.GetInstance().SFX_match;
+                SFXManager.GetInstance().audioSrc.Play();
                 return matchingGemsList;
             }
 
@@ -811,7 +815,7 @@ public class GridManager : MonoBehaviour
                             matchingGemsList.Add(matchedGem);
                         }
 
-                       // Debug.Log("Vertical Swap, Horizontal L or T match !!!");
+                        // Debug.Log("Vertical Swap, Horizontal L or T match !!!");
                         break;
                     }
                 }
@@ -820,6 +824,8 @@ public class GridManager : MonoBehaviour
             // Return the matching list
             if (matchingGemsList.Count >= matchNumber)
             {
+                SFXManager.GetInstance().audioSrc.clip = SFXManager.GetInstance().SFX_match;
+                SFXManager.GetInstance().audioSrc.Play();
                 return matchingGemsList;
             }
         }
@@ -1013,7 +1019,10 @@ public class GridManager : MonoBehaviour
 
         ClearAllValidMatches();
         StartCoroutine(Fill());
-        
+
+        SFXManager.GetInstance().audioSrc.clip = SFXManager.GetInstance().SFX_explode;
+        SFXManager.GetInstance().audioSrc.Play();
+
         //for (int x = 0; x < X_GridDimensions; x++)
         //{
         //    if (x != column)

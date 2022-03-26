@@ -36,7 +36,27 @@ Link: https://www.1001freefonts.com/organo.font
 
 ####
 Sounds
+
 Name: 9 explosion sounds
 Author: Unnamed
 Link: https://opengameart.org/content/9-explosion-sounds
 
+Name: Main Menu
+Author: Scott Jacob Jinglehiemer Schmidt
+Link: https://opengameart.org/content/unicorntales
+
+Name: Game
+Author: CleytonKauffman
+Link: https://opengameart.org/content/childrens-march-theme
+
+Name: Match
+Author: IgnasD
+Link: https://opengameart.org/content/clock-tick-0
+
+Name: Won/Lost
+Author: SoundSnap
+Link: https://www.soundsnap.com/
+
+Name: Decline BuzzBeep
+Author: TannerSound
+Link: https://freesound.org/people/TannerSound/sounds/478262/

@@ -191,6 +191,8 @@ public class GameManager : MonoBehaviour
                 isGameOver = true;
                 EndScreenPanel.SetActive(true);
                 EndScreenPanel.GetComponent<EndScreenManager>().EndScreenText.text = "You ran out of time !!";
+                SFXManager.GetInstance().endSceneAudioSource.clip = SFXManager.GetInstance().SFX_Lost;
+                SFXManager.GetInstance().endSceneAudioSource.Play();
             }
         }
     }
@@ -330,6 +332,18 @@ public class GameManager : MonoBehaviour
     IEnumerator EndScreenWithDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
+
+        if (hasWon)
+        {
+            SFXManager.GetInstance().endSceneAudioSource.clip = SFXManager.GetInstance().SFX_Won;
+        }
+        else
+        {
+            SFXManager.GetInstance().endSceneAudioSource.clip = SFXManager.GetInstance().SFX_Lost;
+        }
+
+        
+        SFXManager.GetInstance().endSceneAudioSource.Play();
         EndScreenPanel.SetActive(true);
     }
 
@@ -353,6 +367,8 @@ public class GameManager : MonoBehaviour
             hasWon = false;
             EndScreenPanel.GetComponent<EndScreenManager>().EndScreenText.text = "You ran out of moves !!";
             EndScreenPanel.SetActive(true);
+            SFXManager.GetInstance().endSceneAudioSource.clip = SFXManager.GetInstance().SFX_Lost;
+            SFXManager.GetInstance().endSceneAudioSource.Play();
         }
     }
 
